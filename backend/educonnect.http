@@ -1,0 +1,5 @@
+@educonnect_HostAddress = http://localhost:5098
+
+### Healthcheck
+GET {{educonnect_HostAddress}}/health
+Accept: application/json
