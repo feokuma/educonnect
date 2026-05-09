@@ -1,4 +1,6 @@
+using System.Net;
 using EduConnect.Integration.Setup;
+using Shouldly;
 
 namespace EduConnect.Integration.Controllers;
 
@@ -12,6 +14,6 @@ public class HealthControllerTests(IntegrationWebAppFactory factory)
     {
         var response = await _client.GetAsync("/health");
 
-        response.EnsureSuccessStatusCode();
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 }

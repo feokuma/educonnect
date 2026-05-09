@@ -3,3 +3,13 @@
 ### Healthcheck
 GET {{educonnect_HostAddress}}/health
 Accept: application/json
+
+### Create user
+POST {{educonnect_HostAddress}}/users
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Jane Doe",
+  "email": "jane.doe@example.com"
+}

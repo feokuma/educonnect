@@ -12,7 +12,10 @@ EduConnect é uma plataforma educacional que conecta alunos e professores. Este 
 | C# | 13 | Linguagem principal |
 | ASP.NET Core OpenAPI | 10.0 | Geração de documentação OpenAPI |
 | xUnit | 2.9 | Framework de testes |
+| Shouldly | 4.3 | Assertions fluentes nos testes |
+| NSubstitute | 5.3 | Mocks nos testes unitários |
 | Microsoft.AspNetCore.Mvc.Testing | 10.0 | Testes de integração com servidor in-process |
+| Testcontainers.PostgreSql | 4.11 | PostgreSQL isolado para testes de integração |
 | coverlet | 6.0 | Coleta de cobertura de testes |
 
 ---
@@ -175,12 +178,16 @@ O projeto tem `<Nullable>enable</Nullable>`, portanto todos os tipos de referên
 
 ### Testes de integração
 
-Os testes de integração usam `WebApplicationFactory<Program>` para subir a aplicação em memória e executar requisições HTTP reais via `HttpClient`. Isso garante que o pipeline completo do ASP.NET Core (middleware, roteamento, serialização) seja exercitado.
+Os testes de integração usam `WebApplicationFactory<Program>` para subir a aplicação em memória e executar requisições HTTP reais via `HttpClient`. Isso garante que o pipeline completo do ASP.NET Core (middleware, roteamento, serialização, application services, repositórios e EF Core) seja exercitado.
 
 - A factory é compartilhada entre testes do mesmo grupo via `ICollectionFixture`, evitando múltiplas inicializações desnecessárias.
 - Os testes rodam com `ASPNETCORE_ENVIRONMENT=Test`.
+- A factory sobe um PostgreSQL isolado com Testcontainers usando a imagem `postgres:17-alpine`.
+- A connection string é sobrescrita pela factory para usar o banco `educonnect-test` dentro do container de teste.
+- A factory recria o banco de teste e aplica as migrations antes da execução.
+- Docker precisa estar disponível para rodar os testes de integração, mas não é necessário subir o `docker-compose.yml` manualmente.
 - Respostas são deserializadas com `ReadFromJsonAsync<T>` para validação do contrato de resposta.
 
 ### Acesso ao `Program` nos testes
 
-A classe `Program` é declarada como `partial` em `Program.cs` para que o projeto de testes de integração possa referenciá-la como tipo genérico da `WebApplicationFactory`. O acesso é permitido via `InternalsVisibleTo` no `.csproj` da aplicação.
+A classe `Program` gerada pelos top-level statements é interna por padrão. O projeto da aplicação usa `InternalsVisibleTo` no `.csproj` para permitir que os testes de integração referenciem `Program` como tipo genérico da `WebApplicationFactory`.
