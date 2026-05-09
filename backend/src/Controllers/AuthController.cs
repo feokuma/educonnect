@@ -27,14 +27,4 @@ public class AuthController(IAuthService authService) : ControllerBase
             ? Unauthorized()
             : Ok(response);
     }
-
-    [HttpPost("validate")]
-    public IActionResult Validate([FromBody] ValidateTokenRequestDto request)
-    {
-        var response = authService.Validate(request);
-
-        return response.IsValid
-            ? Ok(response)
-            : Unauthorized(response);
-    }
 }

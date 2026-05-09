@@ -40,35 +40,6 @@ public sealed class AuthService(IOptions<AuthSettings> options) : IAuthService
         return CreateAuthenticationResponse(state.Subject, state.Email);
     }
 
-    public TokenValidationResponseDto Validate(ValidateTokenRequestDto request)
-    {
-        if (!TryReadPayload(request.Token, out var payload))
-        {
-            return new TokenValidationResponseDto(false, null, null, null);
-        }
-
-        var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-        var issuer = GetString(payload, "iss");
-        var audience = GetString(payload, "aud");
-        var subject = GetString(payload, "sub");
-        var email = GetString(payload, "email");
-        var expiresAtUnix = GetLong(payload, "exp");
-        var notBeforeUnix = GetLong(payload, "nbf");
-
-        var isValid = issuer == _settings.Issuer
-            && audience == _settings.Audience
-            && !string.IsNullOrWhiteSpace(subject)
-            && expiresAtUnix is not null
-            && expiresAtUnix > now
-            && (notBeforeUnix is null || notBeforeUnix <= now);
-
-        DateTimeOffset? expiresAt = expiresAtUnix is null
-            ? null
-            : DateTimeOffset.FromUnixTimeSeconds(expiresAtUnix.Value);
-
-        return new TokenValidationResponseDto(isValid, isValid ? subject : null, isValid ? email : null, expiresAt);
-    }
-
     private AuthResponseDto CreateAuthenticationResponse(string subject, string email)
     {
         var expiresAt = DateTimeOffset.UtcNow.AddMinutes(_settings.AccessTokenExpirationMinutes);
@@ -111,40 +82,6 @@ public sealed class AuthService(IOptions<AuthSettings> options) : IAuthService
         return $"{unsignedToken}.{signature}";
     }
 
-    private bool TryReadPayload(string token, out JsonElement payload)
-    {
-        payload = default;
-        var parts = token.Split('.');
-
-        if (parts.Length != 3)
-        {
-            return false;
-        }
-
-        var expectedSignature = Sign($"{parts[0]}.{parts[1]}");
-        if (!CryptographicOperations.FixedTimeEquals(
-            Encoding.UTF8.GetBytes(expectedSignature),
-            Encoding.UTF8.GetBytes(parts[2])))
-        {
-            return false;
-        }
-
-        try
-        {
-            using var document = JsonDocument.Parse(Base64UrlDecode(parts[1]));
-            payload = document.RootElement.Clone();
-            return true;
-        }
-        catch (JsonException)
-        {
-            return false;
-        }
-        catch (FormatException)
-        {
-            return false;
-        }
-    }
-
     private string Sign(string value)
     {
         using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(_settings.SecretKey));
@@ -162,33 +99,6 @@ public sealed class AuthService(IOptions<AuthSettings> options) : IAuthService
             .TrimEnd('=')
             .Replace('+', '-')
             .Replace('/', '_');
-    }
-
-    private static byte[] Base64UrlDecode(string value)
-    {
-        var base64 = value.Replace('-', '+').Replace('_', '/');
-        var padding = base64.Length % 4;
-
-        if (padding > 0)
-        {
-            base64 = base64.PadRight(base64.Length + 4 - padding, '=');
-        }
-
-        return Convert.FromBase64String(base64);
-    }
-
-    private static string? GetString(JsonElement payload, string propertyName)
-    {
-        return payload.TryGetProperty(propertyName, out var value) && value.ValueKind == JsonValueKind.String
-            ? value.GetString()
-            : null;
-    }
-
-    private static long? GetLong(JsonElement payload, string propertyName)
-    {
-        return payload.TryGetProperty(propertyName, out var value) && value.TryGetInt64(out var result)
-            ? result
-            : null;
     }
 
     private sealed record RefreshTokenState(string Subject, string Email, DateTimeOffset ExpiresAt);

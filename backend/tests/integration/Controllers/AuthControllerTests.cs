@@ -11,7 +11,7 @@ public class AuthControllerTests(IntegrationWebAppFactory factory)
     private readonly HttpClient _client = factory.CreateClient();
 
     [Fact]
-    public async Task Auth_Flow_ReturnsTokensAndValidatesAccessToken()
+    public async Task Auth_Flow_ReturnsTokensAndRefreshesAccessToken()
     {
         var loginRequest = new LoginRequestDto("jane.doe@example.com", "secret123");
 
@@ -25,18 +25,6 @@ public class AuthControllerTests(IntegrationWebAppFactory factory)
         Assert.False(string.IsNullOrWhiteSpace(loginBody!.AccessToken));
         Assert.False(string.IsNullOrWhiteSpace(loginBody.RefreshToken));
         Assert.True(loginBody.ExpiresAt > DateTimeOffset.UtcNow);
-
-        var validateResponse = await _client.PostAsJsonAsync(
-            "/auth/validate",
-            new ValidateTokenRequestDto(loginBody.AccessToken));
-
-        Assert.Equal(HttpStatusCode.OK, validateResponse.StatusCode);
-
-        var validationBody = await validateResponse.Content.ReadFromJsonAsync<TokenValidationResponseDto>();
-
-        Assert.NotNull(validationBody);
-        Assert.True(validationBody!.IsValid);
-        Assert.Equal(loginRequest.Email, validationBody.Email);
 
         var refreshResponse = await _client.PostAsJsonAsync(
             "/auth/refresh",

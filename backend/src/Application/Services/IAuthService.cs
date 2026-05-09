@@ -7,6 +7,4 @@ public interface IAuthService
     AuthResponseDto? Authenticate(LoginRequestDto request);
 
     AuthResponseDto? Refresh(RefreshTokenRequestDto request);
-
-    TokenValidationResponseDto Validate(ValidateTokenRequestDto request);
 }

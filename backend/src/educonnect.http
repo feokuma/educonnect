@@ -22,15 +22,6 @@ Accept: application/json
   "password": "secret123"
 }
 
-### Validate access token
-POST {{educonnect_HostAddress}}/auth/validate
-Content-Type: application/json
-Accept: application/json
-
-{
-  "token": "{{login.response.body.$.accessToken}}"
-}
-
 ### Refresh token
 # @name refresh
 POST {{educonnect_HostAddress}}/auth/refresh
@@ -39,13 +30,4 @@ Accept: application/json
 
 {
   "refreshToken": "{{login.response.body.$.refreshToken}}"
-}
-
-### Validate refreshed access token
-POST {{educonnect_HostAddress}}/auth/validate
-Content-Type: application/json
-Accept: application/json
-
-{
-  "token": "{{refresh.response.body.$.accessToken}}"
 }
