@@ -50,7 +50,7 @@ public class IntegrationWebAppFactory : WebApplicationFactory<Program>, IAsyncLi
         return _postgres.StartAsync();
     }
 
-    public new async Task DisposeAsync()
+    async Task IAsyncLifetime.DisposeAsync()
     {
         await _postgres.DisposeAsync();
         await base.DisposeAsync();
