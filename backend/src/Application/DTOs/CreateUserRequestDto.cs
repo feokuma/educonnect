@@ -1,3 +1,3 @@
-namespace educonnect.Application.DTOs;
+namespace EduConnect.Application.DTOs;
 
 public record CreateUserRequestDto(string Name, string Email);

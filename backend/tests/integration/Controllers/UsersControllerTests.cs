@@ -1,9 +1,9 @@
 using System.Net;
 using System.Net.Http.Json;
-using educonnect.Application.DTOs;
-using educonnect.integration.Setup;
+using EduConnect.Application.DTOs;
+using EduConnect.Integration.Setup;
 
-namespace educonnect.integration.Controllers;
+namespace EduConnect.Integration.Controllers;
 
 [Collection(nameof(IntegrationTestCollection))]
 public class UsersControllerTests(IntegrationWebAppFactory factory)

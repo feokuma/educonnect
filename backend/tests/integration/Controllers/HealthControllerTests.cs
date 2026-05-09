@@ -1,6 +1,6 @@
-using educonnect.integration.Setup;
+using EduConnect.Integration.Setup;
 
-namespace educonnect.integration.Controllers;
+namespace EduConnect.Integration.Controllers;
 
 [Collection(nameof(IntegrationTestCollection))]
 public class HealthControllerTests(IntegrationWebAppFactory factory)

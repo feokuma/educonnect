@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using educonnect.Application.DTOs;
+using EduConnect.Application.DTOs;
 
-namespace educonnect.Controllers;
+namespace EduConnect.Controllers;
 
 [ApiController]
 [Route("users")]

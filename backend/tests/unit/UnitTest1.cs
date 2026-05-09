@@ -1,4 +1,4 @@
-﻿namespace educonnect.unit;
+﻿namespace EduConnect.Unit;
 
 public class UnitTest1
 {

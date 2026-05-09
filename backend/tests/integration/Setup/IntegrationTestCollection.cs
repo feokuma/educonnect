@@ -1,6 +1,6 @@
-using educonnect.integration.Setup;
+using EduConnect.Integration.Setup;
 
-namespace educonnect.integration.Setup;
+namespace EduConnect.Integration.Setup;
 
 [CollectionDefinition(nameof(IntegrationTestCollection))]
 public class IntegrationTestCollection : ICollectionFixture<IntegrationWebAppFactory> { }
