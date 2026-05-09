@@ -6,10 +6,46 @@ Accept: application/json
 
 ### Create user
 POST {{educonnect_HostAddress}}/users
+{
+  "name": "Jane Doe",
+  "email": "jane.doe@example.com"
+}
+  
+### Login
+# @name login
+POST {{educonnect_HostAddress}}/auth/login
 Content-Type: application/json
 Accept: application/json
 
 {
-  "name": "Jane Doe",
-  "email": "jane.doe@example.com"
+  "email": "jane.doe@example.com",
+  "password": "secret123"
+}
+
+### Validate access token
+POST {{educonnect_HostAddress}}/auth/validate
+Content-Type: application/json
+Accept: application/json
+
+{
+  "token": "{{login.response.body.$.accessToken}}"
+}
+
+### Refresh token
+# @name refresh
+POST {{educonnect_HostAddress}}/auth/refresh
+Content-Type: application/json
+Accept: application/json
+
+{
+  "refreshToken": "{{login.response.body.$.refreshToken}}"
+}
+
+### Validate refreshed access token
+POST {{educonnect_HostAddress}}/auth/validate
+Content-Type: application/json
+Accept: application/json
+
+{
+  "token": "{{refresh.response.body.$.accessToken}}"
 }
