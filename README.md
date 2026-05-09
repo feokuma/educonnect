@@ -85,6 +85,37 @@ cd dev-env
 docker compose down -v
 ```
 
+
+### Migrations do EF Core
+
+O backend usa um manifesto de ferramentas local em `backend/.config/dotnet-tools.json` para fixar a versão correta do `dotnet-ef`. Depois de clonar o projeto, restaure as ferramentas locais:
+
+```bash
+cd backend
+dotnet tool restore
+```
+
+Depois de subir o container pela primeira vez, aplique as migrations do backend para criar a estrutura inicial do banco:
+
+```bash
+cd backend
+dotnet ef database update --project src/educonnect.csproj --startup-project src/educonnect.csproj
+```
+
+Use o mesmo comando sempre que novas migrations forem adicionadas ao projeto e precisarem ser aplicadas ao banco local:
+
+```bash
+cd backend
+dotnet ef database update --project src/educonnect.csproj --startup-project src/educonnect.csproj
+```
+
+Para criar uma nova migration após alterar o mapeamento ou as entidades persistidas:
+
+```bash
+cd backend
+dotnet ef migrations add NomeDaMigration --project src/educonnect.csproj --startup-project src/educonnect.csproj --output-dir Infrastructure/Persistence/Migrations
+```
+
 ---
 
 ## Execução rápida
@@ -96,6 +127,14 @@ Aqui temos instruções diretas para colocar a solução em execução. Para ins
 ```bash
 cd dev-env
 docker compose up -d
+```
+
+Na primeira execução, ou depois que novas migrations forem criadas, aplique as migrations:
+
+```bash
+cd ../backend
+dotnet tool restore
+dotnet ef database update --project src/educonnect.csproj --startup-project src/educonnect.csproj
 ```
 
 ### Backend

@@ -1,23 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
 using EduConnect.Application.DTOs;
+using EduConnect.Application.Services;
 
 namespace EduConnect.Controllers;
 
 [ApiController]
 [Route("users")]
-public class UsersController : ControllerBase
+public class UsersController(IUserService userService) : ControllerBase
 {
     [HttpPost]
-    public IActionResult Create([FromBody] CreateUserRequestDto request)
+    public async Task<IActionResult> Create(
+        [FromBody] CreateUserRequestDto request,
+        CancellationToken cancellationToken)
     {
-        var user = new
-        {
-            id = Guid.NewGuid(),
-            name = request.Name,
-            email = request.Email,
-            createdAt = DateTimeOffset.UtcNow
-        };
+        var createdUser = await userService.CreateAsync(request, cancellationToken);
 
-        return Created($"/users/{user.id}", user);
+        return Created($"/users/{createdUser.Id}", createdUser);
     }
 }

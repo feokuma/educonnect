@@ -1,7 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
-using EduConnect.Application.DTOs;
 using EduConnect.Integration.Setup;
+using EduConnect.Tests.Common.Builders.Application.DTOs;
+using Shouldly;
 
 namespace EduConnect.Integration.Controllers;
 
@@ -13,21 +14,24 @@ public class UsersControllerTests(IntegrationWebAppFactory factory)
     [Fact]
     public async Task Post_Users_Returns201AndCreatedUserPayload()
     {
-        var request = new CreateUserRequestDto("Jane Doe", "jane.doe@example.com");
+        var request = new CreateUserRequestDtoBuilder()
+            .WithName("Jane Doe")
+            .WithEmail("jane.doe@example.com")
+            .Generate();
 
         var response = await _client.PostAsJsonAsync("/users", request);
 
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        Assert.NotNull(response.Headers.Location);
-        Assert.StartsWith("/users/", response.Headers.Location!.OriginalString);
+        response.StatusCode.ShouldBe(HttpStatusCode.Created);
+        response.Headers.Location.ShouldNotBeNull();
+        response.Headers.Location!.OriginalString.ShouldStartWith("/users/");
 
         var body = await response.Content.ReadFromJsonAsync<CreatedUserResponse>();
 
-        Assert.NotNull(body);
-        Assert.True(Guid.TryParse(body!.Id, out _));
-        Assert.Equal(request.Name, body.Name);
-        Assert.Equal(request.Email, body.Email);
-        Assert.True(body.CreatedAt > DateTimeOffset.MinValue);
+        body.ShouldNotBeNull();
+        Guid.TryParse(body!.Id, out _).ShouldBeTrue();
+        body.Name.ShouldBe(request.Name);
+        body.Email.ShouldBe(request.Email);
+        body.CreatedAt.ShouldBeGreaterThan(DateTimeOffset.MinValue);
     }
 
     private sealed record CreatedUserResponse(string Id, string Name, string Email, DateTimeOffset CreatedAt);
