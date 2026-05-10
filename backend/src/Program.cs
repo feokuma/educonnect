@@ -40,6 +40,7 @@ builder.Services
     });
 builder.Services.AddAuthorization();
 builder.Services.AddSingleton<IIdGenerator, UuidV7IdGenerator>();
+builder.Services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 builder.Services.AddSingleton<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserRepository, EfCoreUserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();

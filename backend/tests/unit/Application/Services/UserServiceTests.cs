@@ -13,6 +13,7 @@ namespace EduConnect.Unit.Application.Services;
 public class UserServiceTests
 {
     private static readonly Guid GeneratedUserId = Guid.Parse("018f1f7e-6b5a-7f9b-9b6c-2b4c5d6e7f80");
+    private const string GeneratedPasswordHash = "$2a$11$hashed-password";
 
     [Fact]
     public async Task CreateAsync_CreatesUserWithExpectedDataAndReturnsRepositoryResult()
@@ -21,7 +22,7 @@ public class UserServiceTests
             .WithName("Jane Doe")
             .WithEmail("jane.doe@example.com")
             .WithUsername("jane.doe")
-            .WithPasswordHash("hashed-secret")
+            .WithPassword("secret")
             .Generate();
         var repositoryResult = new UserBuilder()
             .WithId(Guid.Parse("018f1f7e-6b5a-7f9b-9b6c-2b4c5d6e7f81"))
@@ -41,7 +42,7 @@ public class UserServiceTests
                 user.Name == request.Name &&
                 user.Email == request.Email &&
                 user.Username == request.Username &&
-                user.PasswordHash == request.PasswordHash &&
+                user.PasswordHash == GeneratedPasswordHash &&
                 user.CreatedAt > DateTimeOffset.MinValue),
             Arg.Any<CancellationToken>());
 
@@ -56,12 +57,14 @@ public class UserServiceTests
     private static (UserService Service, IUserRepository UserRepository) CreateService(User repositoryResult)
     {
         var idGenerator = Substitute.For<IIdGenerator>();
+        var passwordHasher = Substitute.For<IPasswordHasher>();
         var userRepository = Substitute.For<IUserRepository>();
 
         idGenerator.NewId().Returns(GeneratedUserId);
+        passwordHasher.Hash(Arg.Any<string>()).Returns(GeneratedPasswordHash);
         userRepository.CreateAsync(Arg.Any<User>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(repositoryResult));
 
-        return (new UserService(idGenerator, userRepository), userRepository);
+        return (new UserService(idGenerator, passwordHasher, userRepository), userRepository);
     }
 }

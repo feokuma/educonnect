@@ -5,7 +5,10 @@ using EduConnect.Domain.Users;
 
 namespace EduConnect.Application.Services;
 
-public sealed class UserService(IIdGenerator idGenerator, IUserRepository userRepository) : IUserService
+public sealed class UserService(
+    IIdGenerator idGenerator,
+    IPasswordHasher passwordHasher,
+    IUserRepository userRepository) : IUserService
 {
     public async Task<UserResponseDto> CreateAsync(
         CreateUserRequestDto request,
@@ -16,7 +19,7 @@ public sealed class UserService(IIdGenerator idGenerator, IUserRepository userRe
             request.Name,
             request.Email,
             request.Username,
-            request.PasswordHash);
+            passwordHasher.Hash(request.Password));
         var createdUser = await userRepository.CreateAsync(user, cancellationToken);
 
         return new UserResponseDto(

@@ -7,7 +7,7 @@ public sealed class CreateUserRequestDtoBuilder : Faker<CreateUserRequestDto>
 {
     private string? _email;
     private string? _name;
-    private string? _passwordHash;
+    private string? _password;
     private string? _username;
 
     public CreateUserRequestDtoBuilder()
@@ -16,7 +16,7 @@ public sealed class CreateUserRequestDtoBuilder : Faker<CreateUserRequestDto>
             _name ?? faker.Name.FullName(),
             _email ?? faker.Internet.Email(),
             _username ?? faker.Internet.UserName(),
-            _passwordHash ?? faker.Random.Hash()));
+            _password ?? faker.Internet.Password()));
     }
 
     public CreateUserRequestDtoBuilder WithEmail(string email)
@@ -33,9 +33,9 @@ public sealed class CreateUserRequestDtoBuilder : Faker<CreateUserRequestDto>
         return this;
     }
 
-    public CreateUserRequestDtoBuilder WithPasswordHash(string passwordHash)
+    public CreateUserRequestDtoBuilder WithPassword(string password)
     {
-        _passwordHash = passwordHash;
+        _password = password;
 
         return this;
     }

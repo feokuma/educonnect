@@ -2,8 +2,11 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using EduConnect.Application.DTOs;
+using EduConnect.Infrastructure.Persistence;
 using EduConnect.Integration.Setup;
 using EduConnect.Tests.Common.Builders.Application.DTOs;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 
 namespace EduConnect.Integration.Controllers;
@@ -20,7 +23,7 @@ public class UsersControllerTests(IntegrationWebAppFactory factory)
             .WithName("Jane Doe")
             .WithEmail("jane.doe@example.com")
             .WithUsername("jane.doe")
-            .WithPasswordHash("hashed-secret")
+            .WithPassword("secret")
             .Generate();
 
         var response = await _client.PostAsJsonAsync("/users", request);
@@ -37,6 +40,13 @@ public class UsersControllerTests(IntegrationWebAppFactory factory)
         body.Email.ShouldBe(request.Email);
         body.Username.ShouldBe(request.Username);
         body.CreatedAt.ShouldBeGreaterThan(DateTimeOffset.MinValue);
+
+        using var scope = factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<EduConnectDbContext>();
+        var persistedUser = await dbContext.Users.SingleAsync(user => user.Id == body.Id);
+
+        persistedUser.PasswordHash.ShouldNotBe(request.Password);
+        BCrypt.Net.BCrypt.Verify(request.Password, persistedUser.PasswordHash).ShouldBeTrue();
     }
 
     [Fact]

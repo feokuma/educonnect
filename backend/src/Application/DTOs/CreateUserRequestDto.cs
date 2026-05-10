@@ -4,4 +4,4 @@ public record CreateUserRequestDto(
     string Name,
     string Email,
     string Username,
-    string PasswordHash);
+    string Password);
