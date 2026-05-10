@@ -8,7 +8,9 @@ Accept: application/json
 POST {{educonnect_HostAddress}}/users
 {
   "name": "Jane Doe",
-  "email": "jane.doe@example.com"
+  "email": "jane.doe@example.com",
+  "username": "jane.doe",
+  "passwordHash": "hashed-secret"
 }
   
 ### Login

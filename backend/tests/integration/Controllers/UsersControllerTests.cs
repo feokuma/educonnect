@@ -19,6 +19,8 @@ public class UsersControllerTests(IntegrationWebAppFactory factory)
         var request = new CreateUserRequestDtoBuilder()
             .WithName("Jane Doe")
             .WithEmail("jane.doe@example.com")
+            .WithUsername("jane.doe")
+            .WithPasswordHash("hashed-secret")
             .Generate();
 
         var response = await _client.PostAsJsonAsync("/users", request);
@@ -33,6 +35,7 @@ public class UsersControllerTests(IntegrationWebAppFactory factory)
         body!.Id.ShouldNotBe(Guid.Empty);
         body.Name.ShouldBe(request.Name);
         body.Email.ShouldBe(request.Email);
+        body.Username.ShouldBe(request.Username);
         body.CreatedAt.ShouldBeGreaterThan(DateTimeOffset.MinValue);
     }
 

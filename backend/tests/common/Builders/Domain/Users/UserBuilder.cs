@@ -9,6 +9,8 @@ public sealed class UserBuilder : Faker<User>
     private string? _email;
     private Guid? _id;
     private string? _name;
+    private string? _passwordHash;
+    private string? _username;
 
     public UserBuilder()
     {
@@ -16,6 +18,8 @@ public sealed class UserBuilder : Faker<User>
             _id ?? faker.Random.Guid(),
             _name ?? faker.Name.FullName(),
             _email ?? faker.Internet.Email(),
+            _username ?? faker.Internet.UserName(),
+            _passwordHash ?? faker.Random.Hash(),
             _createdAt ?? faker.Date.PastOffset()));
     }
 
@@ -43,6 +47,20 @@ public sealed class UserBuilder : Faker<User>
     public UserBuilder WithName(string name)
     {
         _name = name;
+
+        return this;
+    }
+
+    public UserBuilder WithPasswordHash(string passwordHash)
+    {
+        _passwordHash = passwordHash;
+
+        return this;
+    }
+
+    public UserBuilder WithUsername(string username)
+    {
+        _username = username;
 
         return this;
     }

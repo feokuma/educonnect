@@ -13,12 +13,20 @@ public sealed class EfCoreUserRepository(EduConnectDbContext dbContext) : IUserR
             Id = user.Id,
             Name = user.Name,
             Email = user.Email,
+            Username = user.Username,
+            PasswordHash = user.PasswordHash,
             CreatedAt = user.CreatedAt
         };
 
         dbContext.Users.Add(entity);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return User.Restore(entity.Id, entity.Name, entity.Email, entity.CreatedAt);
+        return User.Restore(
+            entity.Id,
+            entity.Name,
+            entity.Email,
+            entity.Username,
+            entity.PasswordHash,
+            entity.CreatedAt);
     }
 }

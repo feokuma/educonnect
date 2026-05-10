@@ -2,11 +2,13 @@ namespace EduConnect.Domain.Users;
 
 public sealed class User
 {
-    private User(Guid id, string name, string email, DateTimeOffset createdAt)
+    private User(Guid id, string name, string email, string username, string passwordHash, DateTimeOffset createdAt)
     {
         Id = id;
         Name = name;
         Email = email;
+        Username = username;
+        PasswordHash = passwordHash;
         CreatedAt = createdAt;
     }
 
@@ -16,15 +18,25 @@ public sealed class User
 
     public string Email { get; }
 
+    public string Username { get; }
+
+    public string PasswordHash { get; }
+
     public DateTimeOffset CreatedAt { get; }
 
-    public static User Create(Guid id, string name, string email)
+    public static User Create(Guid id, string name, string email, string username, string passwordHash)
     {
-        return new User(id, name, email, DateTimeOffset.UtcNow);
+        return new User(id, name, email, username, passwordHash, DateTimeOffset.UtcNow);
     }
 
-    public static User Restore(Guid id, string name, string email, DateTimeOffset createdAt)
+    public static User Restore(
+        Guid id,
+        string name,
+        string email,
+        string username,
+        string passwordHash,
+        DateTimeOffset createdAt)
     {
-        return new User(id, name, email, createdAt);
+        return new User(id, name, email, username, passwordHash, createdAt);
     }
 }

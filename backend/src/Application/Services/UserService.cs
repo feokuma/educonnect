@@ -11,13 +11,19 @@ public sealed class UserService(IIdGenerator idGenerator, IUserRepository userRe
         CreateUserRequestDto request,
         CancellationToken cancellationToken = default)
     {
-        var user = User.Create(idGenerator.NewId(), request.Name, request.Email);
+        var user = User.Create(
+            idGenerator.NewId(),
+            request.Name,
+            request.Email,
+            request.Username,
+            request.PasswordHash);
         var createdUser = await userRepository.CreateAsync(user, cancellationToken);
 
         return new UserResponseDto(
             createdUser.Id,
             createdUser.Name,
             createdUser.Email,
+            createdUser.Username,
             createdUser.CreatedAt);
     }
 }
