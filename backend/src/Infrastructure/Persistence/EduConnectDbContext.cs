@@ -30,6 +30,19 @@ public class EduConnectDbContext(DbContextOptions<EduConnectDbContext> options) 
             entity.HasIndex(user => user.Email)
                 .IsUnique();
 
+            entity.Property(user => user.Username)
+                .HasColumnName("username")
+                .HasMaxLength(100)
+                .IsRequired();
+
+            entity.HasIndex(user => user.Username)
+                .IsUnique();
+
+            entity.Property(user => user.PasswordHash)
+                .HasColumnName("password_hash")
+                .HasMaxLength(500)
+                .IsRequired();
+
             entity.Property(user => user.CreatedAt)
                 .HasColumnName("created_at")
                 .IsRequired();

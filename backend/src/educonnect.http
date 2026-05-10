@@ -11,5 +11,33 @@ Accept: application/json
 
 {
   "name": "Jane Doe",
-  "email": "jane.doe@example.com"
+  "email": "jane.doe@example.com",
+  "username": "jane.doe",
+  "password": "secret123"
+}
+  
+### Login
+# @name login
+POST {{educonnect_HostAddress}}/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "identifier": "jane.doe@example.com",
+  "password": "secret123"
+}
+
+### Current user
+GET {{educonnect_HostAddress}}/users/me
+Accept: application/json
+Authorization: Bearer {{login.response.body.$.accessToken}}
+
+### Refresh token
+# @name refresh
+POST {{educonnect_HostAddress}}/auth/refresh
+Content-Type: application/json
+Accept: application/json
+
+{
+  "refreshToken": "{{login.response.body.$.refreshToken}}"
 }
