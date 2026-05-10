@@ -4,7 +4,7 @@ namespace EduConnect.Application.Services;
 
 public interface IAuthService
 {
-    AuthResponseDto? Authenticate(LoginRequestDto request);
+    Task<AuthResponseDto?> AuthenticateAsync(LoginRequestDto request, CancellationToken cancellationToken = default);
 
     AuthResponseDto? Refresh(RefreshTokenRequestDto request);
 }

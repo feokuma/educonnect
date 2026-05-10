@@ -3,26 +3,38 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using EduConnect.Application.DTOs;
+using EduConnect.Application.Common;
+using EduConnect.Application.Repositories;
 using EduConnect.Application.Services;
 using Microsoft.Extensions.Options;
 
 namespace EduConnect.Infrastructure.Authentication;
 
-public sealed class AuthService(IOptions<AuthSettings> options) : IAuthService
+public sealed class AuthService(
+    IOptions<AuthSettings> options,
+    IPasswordHasher passwordHasher,
+    IUserRepository userRepository) : IAuthService
 {
     private static readonly ConcurrentDictionary<string, RefreshTokenState> RefreshTokens = new();
 
     private readonly AuthSettings _settings = options.Value;
 
-    public AuthResponseDto? Authenticate(LoginRequestDto request)
+    public async Task<AuthResponseDto?> AuthenticateAsync(
+        LoginRequestDto request,
+        CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+        if (string.IsNullOrWhiteSpace(request.Identifier) || string.IsNullOrWhiteSpace(request.Password))
         {
             return null;
         }
 
-        var userId = Guid.NewGuid().ToString("N");
-        return CreateAuthenticationResponse(userId, request.Email.Trim().ToLowerInvariant());
+        var user = await userRepository.GetByEmailOrUsernameAsync(request.Identifier, cancellationToken);
+        if (user is null || !passwordHasher.Verify(request.Password, user.PasswordHash))
+        {
+            return null;
+        }
+
+        return CreateAuthenticationResponse(user.Id.ToString(), user.Email);
     }
 
     public AuthResponseDto? Refresh(RefreshTokenRequestDto request)

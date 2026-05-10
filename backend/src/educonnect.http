@@ -13,7 +13,7 @@ Accept: application/json
   "name": "Jane Doe",
   "email": "jane.doe@example.com",
   "username": "jane.doe",
-  "password": "secret"
+  "password": "secret123"
 }
   
 ### Login
@@ -23,9 +23,14 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "email": "jane.doe@example.com",
+  "identifier": "jane.doe@example.com",
   "password": "secret123"
 }
+
+### Current user
+GET {{educonnect_HostAddress}}/users/me
+Accept: application/json
+Authorization: Bearer {{login.response.body.$.accessToken}}
 
 ### Refresh token
 # @name refresh

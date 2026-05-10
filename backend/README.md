@@ -116,6 +116,8 @@ dotnet test --collect:"XPlat Code Coverage"
 |---|---|---|
 | `GET` | `/health` | Health check da aplicação |
 | `POST` | `/users` | Cria um novo usuário |
+| `POST` | `/auth/login` | Autentica com email ou usuário |
+| `POST` | `/auth/refresh` | Renova os tokens de autenticação |
 
 ### `GET /health`
 
@@ -135,7 +137,9 @@ Corpo da requisição:
 ```json
 {
   "name": "Jane Doe",
-  "email": "jane.doe@example.com"
+  "email": "jane.doe@example.com",
+  "username": "jane.doe",
+  "password": "secret123"
 }
 ```
 
@@ -146,9 +150,23 @@ Resposta `201 Created` com header `Location: /users/{id}`:
   "id": "550e8400-e29b-41d4-a716-446655440000",
   "name": "Jane Doe",
   "email": "jane.doe@example.com",
+  "username": "jane.doe",
   "createdAt": "2026-05-07T12:00:00+00:00"
 }
 ```
+
+### `POST /auth/login`
+
+Corpo da requisição:
+
+```json
+{
+  "identifier": "jane.doe",
+  "password": "secret123"
+}
+```
+
+O campo `identifier` aceita email ou nome de usuário.
 
 ---
 

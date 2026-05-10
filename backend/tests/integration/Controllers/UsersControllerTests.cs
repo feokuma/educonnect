@@ -52,7 +52,14 @@ public class UsersControllerTests(IntegrationWebAppFactory factory)
     [Fact]
     public async Task Get_UsersMe_WithValidBearerToken_ReturnsCurrentUser()
     {
-        var loginRequest = new LoginRequestDto("jane.doe@example.com", "secret123");
+        var createUserRequest = new CreateUserRequestDtoBuilder()
+            .WithName("Current User Jane")
+            .WithEmail("current.user.jane@example.com")
+            .WithUsername("current.user.jane")
+            .WithPassword("secret123")
+            .Generate();
+        await _client.PostAsJsonAsync("/users", createUserRequest);
+        var loginRequest = new LoginRequestDto(createUserRequest.Email, createUserRequest.Password);
         var loginResponse = await _client.PostAsJsonAsync("/auth/login", loginRequest);
         var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponseDto>();
 
@@ -66,7 +73,7 @@ public class UsersControllerTests(IntegrationWebAppFactory factory)
 
         body.ShouldNotBeNull();
         body!.Id.ShouldNotBeNullOrWhiteSpace();
-        body.Email.ShouldBe(loginRequest.Email);
+        body.Email.ShouldBe(createUserRequest.Email);
         body.TokenExpiresAt.ShouldNotBeNull();
         body.TokenExpiresAt!.Value.ShouldBeGreaterThan(DateTimeOffset.UtcNow);
     }

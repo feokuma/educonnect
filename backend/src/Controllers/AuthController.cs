@@ -9,9 +9,9 @@ namespace EduConnect.Controllers;
 public class AuthController(IAuthService authService) : ControllerBase
 {
     [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequestDto request)
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto request, CancellationToken cancellationToken)
     {
-        var response = authService.Authenticate(request);
+        var response = await authService.AuthenticateAsync(request, cancellationToken);
 
         return response is null
             ? Unauthorized()

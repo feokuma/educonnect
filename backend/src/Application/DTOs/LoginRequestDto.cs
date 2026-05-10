@@ -4,8 +4,7 @@ namespace EduConnect.Application.DTOs;
 
 public record LoginRequestDto(
     [Required]
-    [EmailAddress]
-    string Email,
+    string Identifier,
 
     [Required]
     [MinLength(6)]
