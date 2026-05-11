@@ -27,6 +27,7 @@ public class UsersController(IUserService userService) : ControllerBase
             GetTokenExpiration()));
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromBody] CreateUserRequestDto request,

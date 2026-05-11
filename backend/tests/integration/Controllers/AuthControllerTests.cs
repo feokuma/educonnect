@@ -20,7 +20,7 @@ public class AuthControllerTests(IntegrationWebAppFactory factory)
             .WithUsername("auth.jane")
             .WithPassword("secret123")
             .Generate();
-        await _client.PostAsJsonAsync("/users", createUserRequest);
+        await factory.SeedUserAsync(createUserRequest);
         var loginRequest = new LoginRequestDto(createUserRequest.Email, createUserRequest.Password);
 
         var loginResponse = await _client.PostAsJsonAsync("/auth/login", loginRequest);
@@ -57,7 +57,7 @@ public class AuthControllerTests(IntegrationWebAppFactory factory)
             .WithUsername("username.jane")
             .WithPassword("secret123")
             .Generate();
-        await _client.PostAsJsonAsync("/users", createUserRequest);
+        await factory.SeedUserAsync(createUserRequest);
         var loginRequest = new LoginRequestDto(createUserRequest.Username, createUserRequest.Password);
 
         var loginResponse = await _client.PostAsJsonAsync("/auth/login", loginRequest);
@@ -80,7 +80,7 @@ public class AuthControllerTests(IntegrationWebAppFactory factory)
             .WithUsername("wrong.password.jane")
             .WithPassword("secret123")
             .Generate();
-        await _client.PostAsJsonAsync("/users", createUserRequest);
+        await factory.SeedUserAsync(createUserRequest);
         var loginRequest = new LoginRequestDto(createUserRequest.Email, "wrong-secret");
 
         var loginResponse = await _client.PostAsJsonAsync("/auth/login", loginRequest);
